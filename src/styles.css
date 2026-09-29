@@ -16,6 +16,30 @@
   --log-method-POST: #38bdf8;
   --log-method-OPTIONS: #94a3b8;
   --shadow: rgba(0, 0, 0, 0.4);
+  --log-body-req: #cbd5e1;
+  --log-body-res: #4ade80;
+}
+
+:root[data-theme="light"] {
+  --bg: #f8fafc;
+  --panel: #ffffff;
+  --text: #0f172a;
+  --muted: #64748b;
+  --accent: #0284c7;
+  --accent-dim: #0369a1;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warn: #d97706;
+  --border: #cbd5e1;
+  --sidebar-bg: #f1f5f9;
+  --sidebar-hover: #e2e8f0;
+  --sidebar-active: #0284c7;
+  --log-method-GET: #15803d;
+  --log-method-POST: #0369a1;
+  --log-method-OPTIONS: #64748b;
+  --shadow: rgba(15, 23, 42, 0.12);
+  --log-body-req: #475569;
+  --log-body-res: #15803d;
 }
 
 * { box-sizing: border-box; }
@@ -328,8 +352,8 @@ code, .server-url {
   white-space: pre-wrap;
   word-break: break-all;
 }
-.log-body-req { color: #cbd5e1; }
-.log-body-res { color: var(--success); }
+.log-body-req { color: var(--log-body-req); }
+.log-body-res { color: var(--log-body-res); }
 .log-body-label { color: var(--muted); font-weight: 700; flex-shrink: 0; width: 32px; }
 
 /* ───── Clipboard tools ───── */
