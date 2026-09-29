@@ -177,6 +177,12 @@ function renderShell() {
   void refreshHealth();
   if (healthTimer !== null) window.clearInterval(healthTimer);
   healthTimer = window.setInterval(refreshHealth, 5000);
+
+  // Cross-section navigation: clipboard "→ Chat" / "→ Translate" buttons.
+  window.addEventListener("codexastarte:switch-section", (e) => {
+    const id = (e as CustomEvent<SectionId>).detail;
+    if (SECTIONS[id]) activate(id);
+  });
 }
 
 function updateStatusFromTauri(s: ServerStatus) {

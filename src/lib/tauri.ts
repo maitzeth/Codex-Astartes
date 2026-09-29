@@ -33,6 +33,12 @@ export const tauri = {
   stopServer: () => invoke<ServerStatus>("stop_server"),
   serverStatus: () => invoke<ServerStatus>("server_status"),
 
+  // Clipboard
+  getClipboardHistory: () => invoke<ClipboardItem[]>("get_clipboard_history"),
+  clearClipboardHistory: () => invoke<void>("clear_clipboard_history"),
+  copyToClipboard: (text: string) => invoke<void>("copy_to_clipboard", { text }),
+  setClipboardPollMs: (ms: number) => invoke<Config>("set_clipboard_poll_ms", { ms }),
+
   // Events
   onClipboardChanged: (fn: (items: ClipboardItem[]) => void): Promise<UnlistenFn> =>
     listen<ClipboardItem[]>("clipboard://changed", (e) => fn(e.payload)),

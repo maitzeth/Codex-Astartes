@@ -1,9 +1,10 @@
 //! All `#[tauri::command]` entry points exposed to the TypeScript frontend.
 
-use crate::config::{self, Config};
+use crate::config::{self, ClipboardItem, Config};
 use crate::server::{self, ServerHandle, ServerStatus};
 use std::sync::Arc;
 use tauri::State;
+use tauri_plugin_clipboard_manager::ClipboardExt;
 
 /// Shared app state held by Tauri.
 pub struct AppState {
@@ -96,4 +97,40 @@ pub async fn stop_server(state: State<'_, AppState>) -> Result<ServerStatus, Str
 #[tauri::command]
 pub async fn server_status(state: State<'_, AppState>) -> Result<ServerStatus, String> {
     server::status(&state.server).await
+}
+
+// ---------------------------------------------------------------------------
+// Clipboard commands
+// ---------------------------------------------------------------------------
+
+#[tauri::command]
+pub async fn get_clipboard_history(
+    state: State<'_, AppState>,
+) -> Result<Vec<ClipboardItem>, String> {
+    let cfg = state.config.lock().await;
+    Ok(cfg.clipboard.items.clone())
+}
+
+#[tauri::command]
+pub async fn clear_clipboard_history(state: State<'_, AppState>) -> Result<(), String> {
+    let mut cfg = state.config.lock().await;
+    cfg.clipboard.items.clear();
+    config::save(&cfg)?;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn copy_to_clipboard(app: tauri::AppHandle, text: String) -> Result<(), String> {
+    app.clipboard().write_text(text).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn set_clipboard_poll_ms(
+    ms: u64,
+    state: State<'_, AppState>,
+) -> Result<Config, String> {
+    let mut cfg = state.config.lock().await;
+    cfg.clipboard.poll_ms = ms;
+    config::save(&cfg)?;
+    Ok(cfg.clone())
 }

@@ -3,7 +3,11 @@ mod commands;
 mod config;
 mod server;
 
-use commands::{get_config, server_status, set_server_dir, set_server_url, set_theme, start_server, stop_server, AppState};
+use commands::{
+    clear_clipboard_history, copy_to_clipboard, get_clipboard_history, get_config, server_status,
+    set_clipboard_poll_ms, set_server_dir, set_server_url, set_theme, start_server, stop_server,
+    AppState,
+};
 
 fn main() {
     tauri::Builder::default()
@@ -23,6 +27,10 @@ fn main() {
             start_server,
             stop_server,
             server_status,
+            get_clipboard_history,
+            clear_clipboard_history,
+            copy_to_clipboard,
+            set_clipboard_poll_ms,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
