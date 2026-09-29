@@ -6,7 +6,6 @@
 //! even though `run.sh`'s bash process exits immediately.
 
 use std::path::PathBuf;
-use std::process::Stdio;
 use serde::Serialize;
 use tokio::process::Command;
 
@@ -98,25 +97,45 @@ pub async fn start_and_track(
         }
     }
 
-    // Invoke run.sh start. It backgrounds Python with nohup and writes PID.
-    let _ = Command::new("bash")
+    // Invoke run.sh start. Capture stdout/stderr so error messages can
+    // include the actual script output instead of just "no pid".
+    let output = Command::new("bash")
         .arg(dir.join("run.sh"))
         .arg("start")
         .current_dir(&dir)
-        .stdout(Stdio::null())
-        .stderr(Stdio::null())
-        .status()
+        .output()
         .await
         .map_err(|e| {
             format!(
-                "Failed to start server: {}. Is Git Bash installed and on PATH?",
+                "Failed to spawn bash run.sh start: {}. Is Git Bash installed and on PATH?",
                 e
             )
         })?;
 
+    if !output.status.success() {
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        return Err(format!(
+            "run.sh start exited with code {:?}.
+--- stdout ---
+{}
+--- stderr ---
+{}",
+            output.status.code(),
+            stdout.trim(),
+            stderr.trim()
+        ));
+    }
+
     // Read the PID that run.sh wrote.
-    let pid = read_pid_file(backend_dir)
-        .ok_or_else(|| "run.sh did not write server.pid; check run.sh start output".to_string())?;
+    let pid = read_pid_file(backend_dir).ok_or_else(|| {
+        format!(
+            "run.sh start succeeded but server.pid was not written.
+run.sh output:
+{}",
+            String::from_utf8_lossy(&output.stdout)
+        )
+    })?;
 
     // Validate that the PID actually exists (defensive: in case of stale pid file).
     if !is_pid_alive(pid) {
@@ -136,6 +155,7 @@ pub async fn start_and_track(
         pid: Some(pid),
     })
 }
+
 
 pub async fn stop(handle: &ServerHandle, backend_dir: &str) -> Result<ServerStatus, String> {
     let pid_to_kill = {
