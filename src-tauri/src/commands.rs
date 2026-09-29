@@ -91,7 +91,11 @@ pub async fn start_server(state: State<'_, AppState>) -> Result<ServerStatus, St
 
 #[tauri::command]
 pub async fn stop_server(state: State<'_, AppState>) -> Result<ServerStatus, String> {
-    server::stop(&state.server).await
+    let backend_dir = {
+        let cfg = state.config.lock().await;
+        cfg.server.dir.clone()
+    };
+    server::stop(&state.server, &backend_dir).await
 }
 
 #[tauri::command]
