@@ -13,6 +13,7 @@ export type SectionId =
   | "chat"
   | "translate"
   | "tools"
+  | "youtube"
   | "rest"
   | "activity"
   | "settings";

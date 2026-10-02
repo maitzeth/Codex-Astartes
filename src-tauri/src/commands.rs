@@ -2,14 +2,16 @@
 
 use crate::config::{self, ClipboardItem, Config};
 use crate::server::{self, ServerHandle, ServerStatus};
+use crate::youtube::{self, DownloadRegistry, DownloadStarted, Format};
 use std::sync::Arc;
-use tauri::State;
+use tauri::{AppHandle, State};
 use tauri_plugin_clipboard_manager::ClipboardExt;
 
 /// Shared app state held by Tauri.
 pub struct AppState {
     pub config: tokio::sync::Mutex<Config>,
     pub server: Arc<ServerHandle>,
+    pub youtube: Arc<DownloadRegistry>,
 }
 
 impl AppState {
@@ -17,6 +19,7 @@ impl AppState {
         AppState {
             config: tokio::sync::Mutex::new(config::load()),
             server: Arc::new(ServerHandle::new()),
+            youtube: Arc::new(DownloadRegistry::new()),
         }
     }
 }
@@ -137,4 +140,37 @@ pub async fn set_clipboard_poll_ms(
     cfg.clipboard.poll_ms = ms;
     config::save(&cfg)?;
     Ok(cfg.clone())
+}
+
+// ---------------------------------------------------------------------------
+// YouTube downloader commands
+// ---------------------------------------------------------------------------
+
+#[tauri::command]
+pub async fn check_yt_dlp() -> Result<bool, String> {
+    Ok(youtube::check_available().await)
+}
+
+#[tauri::command]
+pub async fn download_youtube(
+    app: AppHandle,
+    state: State<'_, AppState>,
+    url: String,
+    format: Format,
+    output_dir: String,
+) -> Result<DownloadStarted, String> {
+    youtube::start(&app, &state.youtube, url, format, output_dir).await
+}
+
+#[tauri::command]
+pub async fn cancel_download(
+    state: State<'_, AppState>,
+    id: String,
+) -> Result<(), String> {
+    youtube::cancel(&state.youtube, id).await
+}
+
+#[tauri::command]
+pub async fn update_yt_dlp() -> Result<String, String> {
+    youtube::update().await
 }

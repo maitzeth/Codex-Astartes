@@ -2,11 +2,12 @@ mod clipboard;
 mod commands;
 mod config;
 mod server;
+mod youtube;
 
 use commands::{
-    clear_clipboard_history, copy_to_clipboard, get_clipboard_history, get_config, server_status,
-    set_clipboard_poll_ms, set_server_dir, set_server_url, set_theme, start_server, stop_server,
-    AppState,
+    cancel_download, check_yt_dlp, clear_clipboard_history, copy_to_clipboard,
+    download_youtube, get_clipboard_history, get_config, server_status, set_clipboard_poll_ms,
+    set_server_dir, set_server_url, set_theme, start_server, stop_server, update_yt_dlp, AppState,
 };
 
 fn main() {
@@ -31,6 +32,10 @@ fn main() {
             clear_clipboard_history,
             copy_to_clipboard,
             set_clipboard_poll_ms,
+            check_yt_dlp,
+            download_youtube,
+            cancel_download,
+            update_yt_dlp,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

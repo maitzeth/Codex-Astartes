@@ -6,6 +6,7 @@ import type { Section, SectionContext, SectionController, SectionId } from "./se
 import { chatSection } from "./sections/chat";
 import { translateSection } from "./sections/translate";
 import { toolsSection } from "./sections/tools";
+import { youtubeSection } from "./sections/youtube";
 import { restSection } from "./sections/rest";
 import { activitySection } from "./sections/activity";
 import { settingsSection } from "./sections/settings";
@@ -14,6 +15,7 @@ const SECTIONS: Record<SectionId, Section> = {
   chat: chatSection,
   translate: translateSection,
   tools: toolsSection,
+  youtube: youtubeSection,
   rest: restSection,
   activity: activitySection,
   settings: settingsSection,
@@ -207,6 +209,29 @@ async function refreshHealth() {
   }
 }
 
+function wrapInWindow(label: string, body: HTMLElement): HTMLElement {
+  const win = document.createElement("div");
+  win.className = "window";
+  win.style.marginBottom = "8px";
+  const bar = document.createElement("div");
+  bar.className = "title-bar";
+  const text = document.createElement("div");
+  text.className = "title-bar-text";
+  text.textContent = label;
+  const ctrls = document.createElement("div");
+  ctrls.className = "title-bar-controls";
+  ctrls.innerHTML =
+    '<button aria-label="Minimize"></button>' +
+    '<button aria-label="Maximize"></button>' +
+    '<button aria-label="Close"></button>';
+  bar.append(text, ctrls);
+  const winBody = document.createElement("div");
+  winBody.className = "window-body";
+  winBody.appendChild(body);
+  win.append(bar, winBody);
+  return win;
+}
+
 function activate(id: SectionId) {
   activeController?.destroy();
   activeController = null;
@@ -223,7 +248,7 @@ function activate(id: SectionId) {
   const root = section.render(ctx);
   const main = document.querySelector<HTMLDivElement>("#content")!;
   main.innerHTML = "";
-  main.appendChild(root);
+  main.appendChild(wrapInWindow(section.label, root));
 
   activeId = id;
   const ctrl = (root as HTMLElement & { _controller?: SectionController })._controller;

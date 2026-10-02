@@ -57,3 +57,8 @@ export const folderIcon = (opts: IconOpts = {}) => {
   const { size, cls } = o(opts);
   return `<svg ${baseProps(size, cls)}><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>`;
 };
+
+export const youtubeIcon = (opts: IconOpts = {}) => {
+  const { size, cls } = o(opts);
+  return `<svg ${baseProps(size, cls)}><rect x="2" y="5" width="20" height="14" rx="3" ry="3"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/></svg>`;
+};
