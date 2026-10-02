@@ -16,3 +16,7 @@ src-tauri/Cargo.lock
 .DS_Store
 Thumbs.db
 *.swp
+
+# Agent / tool metadata (local-only, never commit)
+.atl/
+.serena/

@@ -73,7 +73,7 @@ The config file lives in the same directory as the executable. For the NSIS-inst
 ```toml
 [server]
 # Absolute path to the LexiLocal backend install directory.
-dir = "C:\\Users\\andre\\Documents\\Projects\\ollama-qwen-server"
+dir = "C:\\path\\to\\LexiLocal"
 # Base URL the frontend uses to reach the backend.
 url = "http://localhost:8000"
 
